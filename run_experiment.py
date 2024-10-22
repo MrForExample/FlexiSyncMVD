@@ -3,9 +3,17 @@ from os.path import join, isdir, abspath, dirname, basename, splitext
 from IPython.display import display
 from datetime import datetime
 import torch
-from diffusers import StableDiffusionControlNetPipeline, ControlNetModel
-from diffusers import DDPMScheduler, UniPCMultistepScheduler
+from diffusers import (
+    StableDiffusionControlNetPipeline,
+    StableDiffusionXLControlNetPipeline,
+    ControlNetModel,
+)
+from diffusers import (
+    DDPMScheduler, 
+    DDIMScheduler,
+)
 from src.pipeline import StableSyncMVDPipeline
+from src.pipeline_XL import StableSyncMVDPipelineXL
 from src.configs import *
 from shutil import copy
 
@@ -54,21 +62,37 @@ logging_config = {
 	"tex_fast_preview": opt.tex_fast_preview,
 	}
 
-if opt.cond_type == "normal":
-	controlnet = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_normalbae", variant="fp16", torch_dtype=torch.float16)
-elif opt.cond_type == "depth":
-	controlnet = ControlNetModel.from_pretrained("lllyasviel/control_v11f1p_sd15_depth", variant="fp16", torch_dtype=torch.float16)			
+if opt.t2i_model == "SD1.5":
 
-pipe = StableDiffusionControlNetPipeline.from_pretrained(
-	"runwayml/stable-diffusion-v1-5", controlnet=controlnet, torch_dtype=torch.float16
-)
+	if opt.cond_type == "normal":
+		controlnet = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_normalbae", variant="fp16", torch_dtype=torch.float16)
+	elif opt.cond_type == "depth":
+		controlnet = ControlNetModel.from_pretrained("lllyasviel/control_v11f1p_sd15_depth", variant="fp16", torch_dtype=torch.float16)
+	else:
+		ValueError(f"Condition {opt.cond_type} is not supported")	
 
+	pipe = StableDiffusionControlNetPipeline.from_pretrained(
+		"runwayml/stable-diffusion-v1-5", controlnet=controlnet, torch_dtype=torch.float16
+	)
 
-pipe.scheduler = DDPMScheduler.from_config(pipe.scheduler.config)
+	pipe.scheduler = DDPMScheduler.from_config(pipe.scheduler.config)
 
-syncmvd = StableSyncMVDPipeline(**pipe.components)
+	syncmvd = StableSyncMVDPipeline(**pipe.components)
+ 
+elif opt.t2i_model == "SDXL":
+    
+	if opt.cond_type == "depth":
+		controlnet = ControlNetModel.from_pretrained("xinsir/controlnet-depth-sdxl-1.0", torch_dtype=torch.float16)
+	else:
+		ValueError(f"Condition {opt.cond_type} is not supported")
 
+	pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
+		"stabilityai/stable-diffusion-xl-base-1.0", controlnet=controlnet, torch_dtype=torch.float16
+	)
 
+	#pipe.scheduler = DDIMScheduler.from_config(pipe.scheduler.config)
+
+	syncmvd = StableSyncMVDPipelineXL(**pipe.components)
 
 result_tex_rgb, textured_views, v = syncmvd(
 	prompt=opt.prompt,

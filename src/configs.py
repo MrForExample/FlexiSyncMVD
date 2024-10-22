@@ -14,6 +14,7 @@ def parse_config():
     parser.add_argument('--use_mesh_name', action='store_true')
     parser.add_argument('--timeformat', type=str, default='%d%b%Y-%H%M%S', help='Setting to None will not use time string in output directory')
     # Diffusion Config
+    parser.add_argument('--t2i_model', type=str, default='SD1.5', help='Support SD1.5 and SDXL')
     parser.add_argument('--prompt', type=str, required=True)
     parser.add_argument('--negative_prompt', type=str, default='oversmoothed, blurry, depth of field, out of focus, low quality, bloom, glowing effect.')
     parser.add_argument('--steps', type=int, default=30)
