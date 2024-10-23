@@ -60,7 +60,7 @@ logging_config = {
 	"log_interval":opt.log_interval,
 	"view_fast_preview": opt.view_fast_preview,
 	"tex_fast_preview": opt.tex_fast_preview,
-	}
+}
 
 if opt.t2i_model == "SD1.5":
 
@@ -91,6 +91,7 @@ elif opt.t2i_model == "SDXL":
 	)
 
 	#pipe.scheduler = DDIMScheduler.from_config(pipe.scheduler.config)
+	#pipe.scheduler = DDPMScheduler.from_config(pipe.scheduler.config)
 
 	syncmvd = StableSyncMVDPipelineXL(**pipe.components)
 

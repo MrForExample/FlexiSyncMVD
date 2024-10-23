@@ -256,15 +256,15 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 			device=self._execution_device, 
 			dtype=self.text_encoder.dtype
 		) * color_images
+		print(f"text_encoder.dtype: {self.text_encoder.dtype}")
 		color_images = ((0.5*color_images)+0.5)
-		color_latents = encode_latents(self.vae, color_images)
-
+		color_latents = encode_latents(self.vae.to(torch.float32), color_images.to(torch.float32)).to(torch.float16)
+		print(f"Color latents: {color_latents.mean()}, {color_latents.std()}")
+		assert not torch.isnan(color_latents).any(), "color_latents contains nan values"
 		self.color_latents = {color[0]:color[1] for color in zip(color_names, [latent for latent in color_latents])}
-		self.vae = self.vae.to("cpu")
+		self.vae = self.vae.to(device="cpu", dtype=torch.float16)
 
 		print("Done Initialization")
-
-
 
 
 	'''
@@ -435,27 +435,27 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 			lora_scale=text_encoder_lora_scale,
 		)
   
-		prompt_embeds = torch.cat([prompt_embeds_tuple[1], prompt_embeds_tuple[0]]).to(device)
-		negative_prompt_embeds, prompt_embeds = torch.chunk(prompt_embeds, 2)
-		prompt_embed_dict = dict(zip(direction_names, [emb for emb in prompt_embeds]))
+		all_prompt_embeds = torch.cat([prompt_embeds_tuple[1], prompt_embeds_tuple[0]]).to(device)
+		negative_prompt_embeds, positive_prompt_embeds = torch.chunk(all_prompt_embeds, 2)
+		prompt_embed_dict = dict(zip(direction_names, [emb for emb in positive_prompt_embeds]))
 		negative_prompt_embed_dict = dict(zip(direction_names, [emb for emb in negative_prompt_embeds]))
   
 		pooled_prompt_embeds, negative_pooled_prompt_embeds = prompt_embeds_tuple[2], prompt_embeds_tuple[3]
-		add_text_embeds = pooled_prompt_embeds
+		pooled_prompt_embed_dict = dict(zip(direction_names, [emb for emb in pooled_prompt_embeds]))
+		pooled_negative_prompt_embed_dict = dict(zip(direction_names, [emb for emb in negative_pooled_prompt_embeds]))
   
 		if self.text_encoder_2 is None:
 			text_encoder_projection_dim = int(pooled_prompt_embeds.shape[-1])
 		else:
 			text_encoder_projection_dim = self.text_encoder_2.config.projection_dim
    
-		add_text_embeds = torch.cat([negative_pooled_prompt_embeds, add_text_embeds], dim=0).to(device)
-  
-		print(f"add_text_embeds: {add_text_embeds.shape}; prompt_embeds: {prompt_embeds.shape}")
+		#print(f"pooled_prompt_embeds: {pooled_prompt_embeds.shape}; positive_prompt_embeds: {positive_prompt_embeds.shape}")
+		#pooled_prompt_embeds: torch.Size([6, 1280]); positive_prompt_embeds: torch.Size([6, 77, 2048])
 
 		# (4. Prepare image) This pipeline use internal conditional images from Pytorch3D
 		self.uvp.to(self._execution_device)
 		conditioning_images, masks = get_conditioning_images(self.uvp, height, cond_type=cond_type)
-		conditioning_images = conditioning_images.type(prompt_embeds.dtype)
+		conditioning_images = conditioning_images.to(device, dtype=positive_prompt_embeds.dtype)
 		cond = (conditioning_images/2+0.5).permute(0,2,3,1).cpu().numpy()
 		cond = np.concatenate([img for img in cond], axis=1)
 		numpy_to_pil(cond)[0].save(f"{self.intermediate_dir}/cond.jpg")
@@ -466,28 +466,27 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 		# 5. Prepare timesteps
 		self.scheduler.set_timesteps(num_inference_steps, device=device)
 		timesteps = self.scheduler.timesteps
+		print("Timesteps:", timesteps)
   
-		add_time_ids = self._get_add_time_ids(
+		positive_add_time_ids = self._get_add_time_ids(
 			original_size,
 			crops_coords_top_left,
 			target_size,
-			dtype=prompt_embeds.dtype,
+			dtype=positive_prompt_embeds.dtype,
 			text_encoder_projection_dim=text_encoder_projection_dim,
-		)
+		).to(device)
+		positive_add_time_ids = positive_add_time_ids.repeat(batch_size * num_images_per_prompt, 1)
 
 		if negative_original_size is not None and negative_target_size is not None:
 			negative_add_time_ids = self._get_add_time_ids(
 				negative_original_size,
 				negative_crops_coords_top_left,
 				negative_target_size,
-				dtype=prompt_embeds.dtype,
+				dtype=positive_prompt_embeds.dtype,
 				text_encoder_projection_dim=text_encoder_projection_dim,
 			)
 		else:
-			negative_add_time_ids = add_time_ids
-
-		add_time_ids = torch.cat([negative_add_time_ids, add_time_ids], dim=0).to(device)
-		add_time_ids = add_time_ids.repeat(batch_size * num_images_per_prompt, 1)
+			negative_add_time_ids = positive_add_time_ids
   
         # 5.5 Optionally get Guidance Scale Embedding
 		timestep_cond = None
@@ -504,11 +503,12 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 			num_channels_latents,
 			height,
 			width,
-			prompt_embeds.dtype,
+			positive_prompt_embeds.dtype,
 			device,
 			generator,
 			None,
 		)
+		print("Initial Latents:", latents.mean(), latents.std())
 
 		latent_tex = self.uvp.set_noise_texture()
 		noise_views = self.uvp.render_textured_views()
@@ -547,6 +547,12 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 
 				negative_prompt_embeds = [azim_neg_prompt(negative_prompt_embed_dict, pose) for pose in self.camera_poses]
 				negative_prompt_embeds = torch.stack(negative_prompt_embeds, axis=0)
+    
+				pooled_positive_prompt_embeds = [azim_prompt(pooled_prompt_embed_dict, pose) for pose in self.camera_poses]
+				pooled_positive_prompt_embeds = torch.stack(pooled_positive_prompt_embeds, axis=0)
+
+				pooled_negative_prompt_embeds = [azim_neg_prompt(pooled_negative_prompt_embed_dict, pose) for pose in self.camera_poses]
+				pooled_negative_prompt_embeds = torch.stack(pooled_negative_prompt_embeds, axis=0)
 
 
 				# expand the latents if we are doing classifier free guidance
@@ -556,19 +562,20 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 					Use groups to manage prompt and results
 					Make sure negative and positive prompt does not perform attention together
 				'''
-				prompt_embeds_groups = {"positive": positive_prompt_embeds}
+				prompt_embeds_groups = {"positive": [positive_prompt_embeds, pooled_positive_prompt_embeds, positive_add_time_ids]}
 				result_groups = {}
 				if do_classifier_free_guidance:
-					prompt_embeds_groups["negative"] = negative_prompt_embeds
-     
-				model_input_batches = [torch.index_select(latent_model_input, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
-				prompt_embeds_batches = [torch.index_select(prompt_embeds, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
-				text_embeds_batches = [torch.index_select(add_text_embeds, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
-				time_ids_batches = [torch.index_select(add_time_ids, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
+					prompt_embeds_groups["negative"] = [negative_prompt_embeds, pooled_negative_prompt_embeds, negative_add_time_ids]
 				
-				for prompt_tag, prompt_embeds in prompt_embeds_groups.items():
+				for prompt_tag, prompt_embeds_list in prompt_embeds_groups.items():
+					prompt_embeds, add_text_embeds, add_time_ids = prompt_embeds_list
 					if prompt_tag == "positive" or not guess_mode:
 						# controlnet(s) inference
+						control_model_input = latent_model_input
+						controlnet_prompt_embeds = prompt_embeds
+						control_add_text_embeds = add_text_embeds
+						control_add_time_ids = add_time_ids
+
 						if isinstance(controlnet_keep[i], list):
 							cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
 						else:
@@ -582,11 +589,16 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 						down_block_res_samples_list = []
 						mid_block_res_sample_list = []
 
+						model_input_batches = [torch.index_select(control_model_input, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
+						prompt_embeds_batches = [torch.index_select(controlnet_prompt_embeds, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
 						conditioning_images_batches = [torch.index_select(conditioning_images, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
+						text_embeds_batches = [torch.index_select(control_add_text_embeds, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
+						time_ids_batches = [torch.index_select(control_add_time_ids, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
 
 						for model_input_batch ,prompt_embeds_batch, conditioning_images_batch, text_embeds_batch, time_ids_batch \
 							in zip (model_input_batches, prompt_embeds_batches, conditioning_images_batches, text_embeds_batches, time_ids_batches):
 							controlnet_added_cond_kwargs = {"text_embeds": text_embeds_batch, "time_ids": time_ids_batch}
+       
 							down_block_res_samples, mid_block_res_sample = self.controlnet(
 								model_input_batch,
 								t,
@@ -601,7 +613,7 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 							mid_block_res_sample_list.append(mid_block_res_sample)
 
 						''' For the ith element of down_block_res_samples, concat the ith element of all mini-batch result '''
-						model_input_batches = prompt_embeds_batches = conditioning_images_batches = None
+						model_input_batches = prompt_embeds_batches = conditioning_images_batches = text_embeds_batches = time_ids_batches = None
 
 						if guess_mode:
 							for dbres in down_block_res_samples_list:
@@ -635,8 +647,12 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 						and re group them into m lists of n mini batch samples.
 					
 					'''
-					noise_pred_list = []					
-
+					noise_pred_list = []
+					model_input_batches = [torch.index_select(latent_model_input, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
+					prompt_embeds_batches = [torch.index_select(prompt_embeds, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]					
+					text_embeds_batches = [torch.index_select(add_text_embeds, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
+					time_ids_batches = [torch.index_select(add_time_ids, dim=0, index=torch.tensor(meta[0], device=self._execution_device)) for meta in self.group_metas]
+      
 					for model_input_batch, prompt_embeds_batch, text_embeds_batch, time_ids_batch, down_block_res_samples_batch, mid_block_res_sample_batch, meta \
 						in zip(model_input_batches, prompt_embeds_batches, text_embeds_batches, time_ids_batches, down_block_res_samples_list, mid_block_res_sample_list, self.group_metas):
 						if t > num_timesteps * (1- ref_attention_end):
@@ -645,6 +661,12 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 							replace_attention_processors(self.unet, SamplewiseAttnProcessor2_0, attention_mask=meta[2], ref_attention_mask=meta[3], ref_weight=0)
 
 						added_cond_kwargs = {"text_embeds": text_embeds_batch, "time_ids": time_ids_batch}
+      
+						assert not torch.isnan(model_input_batch).any(), "Model input batch contains nan values"
+						assert not torch.isnan(prompt_embeds_batch).any(), "Prompt embeds batch contains nan values"
+						assert not torch.isnan(conditioning_images_batch).any(), "Conditioning images batch contains nan values"
+						assert not torch.isnan(text_embeds_batch).any(), "Text embeds batch contains nan values"
+						assert not torch.isnan(time_ids_batch).any(), "Time ids batch contains nan values"
 
 						noise_pred = self.unet(
 							model_input_batch,
@@ -678,6 +700,8 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 				if do_classifier_free_guidance and guidance_rescale > 0.0:
 					# Based on 3.4. in https://arxiv.org/pdf/2305.08891.pdf
 					noise_pred = rescale_noise_cfg(noise_pred, noise_pred_text, guidance_rescale=guidance_rescale)
+     
+				assert not torch.isnan(noise_pred).any(), "Final Noise prediction contains nan values"
 
 				self.uvp.to(self._execution_device)
 				# compute the previous noisy sample x_t -> x_t-1
@@ -704,6 +728,7 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 					# Composit latent foreground with random color background
 					background_latents = [self.color_latents[color] for color in background_colors]
 					composited_tensor = composite_rendered_view(self.scheduler, background_latents, latents, masks, t)
+					assert not torch.isnan(composited_tensor).any(), "composited_tensor contains nan values"
 					latents = composited_tensor.type(latents.dtype)
 
 					intermediate_results.append((latents.to("cpu"), pred_original_sample.to("cpu")))
@@ -715,6 +740,10 @@ class StableSyncMVDPipelineXL(StableDiffusionXLControlNetPipeline):
 					latent_tex = None
 
 					intermediate_results.append((latents.to("cpu"), pred_original_sample.to("cpu")))
+     
+				assert not torch.isnan(pred_original_sample).any(), "pred_original_sample contains nan values"
+				assert not torch.isnan(latents).any(), "latents contains nan values"
+				#assert not torch.isnan(latent_tex).any(), "latent_tex contains nan values"
 
 				del noise_pred, result_groups
 					

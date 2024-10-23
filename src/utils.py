@@ -11,9 +11,13 @@ from torchvision.transforms import Resize, InterpolationMode
 '''
 @torch.no_grad()
 def encode_latents(vae, imgs):
+	assert not torch.isnan(imgs).any(), "Input images contain nan values"
 	imgs = (imgs-0.5)*2
 	latents = vae.encode(imgs).latent_dist.sample()
+	assert not torch.isnan(latents).any(), "Encoded latents contain nan values"
 	latents = vae.config.scaling_factor * latents
+	# Ensure latents do not contain nan values after scaling
+	assert not torch.isnan(latents).any(), "Scaled latents contain nan values"
 	return latents
 
 
