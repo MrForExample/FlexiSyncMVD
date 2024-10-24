@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import torch
 import pytorch3d
@@ -84,12 +84,12 @@ class HardNChannelFlatShader(ShaderBase):
 		blend_params_new = BlendParams(background_color=(1.0,)*channels)
 		if not isinstance(blend_params, BlendParams):
 			blend_params = blend_params_new
-		else:
-			background_color_ = blend_params.background_color
-			if isinstance(background_color_, Sequence[float]) and not len(background_color_) == channels:
-				blend_params = blend_params_new
-			if isinstance(background_color_, torch.Tensor) and not background_color_.shape[-1] == channels:
-				blend_params = blend_params_new
+		#else:
+			#background_color_ = blend_params.background_color
+			#if isinstance(background_color_, Tuple[float]) and not len(background_color_) == channels:
+			#	blend_params = blend_params_new
+			#if isinstance(background_color_, torch.Tensor) and not background_color_.shape[-1] == channels:
+			#	blend_params = blend_params_new
 
 		super().__init__(
 			device,

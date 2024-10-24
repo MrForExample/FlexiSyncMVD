@@ -18,6 +18,7 @@ from pytorch3d.renderer import (
 	MeshRasterizer,  
 	TexturesUV
 )
+from pytorch3d.renderer.blending import BlendParams
 
 from .geometry import HardGeometryShader
 from .shader import HardNChannelFlatShader
@@ -246,7 +247,7 @@ class UVProjection():
 				device=self.device, 
 				cameras=self.cameras,
 				lights=self.lights,
-				channels=channels
+				channels=channels,
 				# materials=materials
 			)
 		)
@@ -292,7 +293,7 @@ class UVProjection():
 			size = self.renderer.rasterizer.raster_settings.image_size
 			self.renderer.rasterizer.raster_settings.image_size = image_size
 		shader = self.renderer.shader
-		self.renderer.shader = HardGeometryShader(device=self.device, cameras=self.cameras[0], lights=self.lights)
+		self.renderer.shader = HardGeometryShader(device=self.device, cameras=self.cameras[0], lights=self.lights, blend_params=BlendParams(background_color=(0,)*self.channels))
 		tmp_mesh = self.mesh.clone()
 		
 		verts, normals, depths, cos_angles, texels, fragments = self.renderer(tmp_mesh.extend(len(self.cameras)), cameras=self.cameras, lights=self.lights)

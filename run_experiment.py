@@ -7,6 +7,7 @@ from diffusers import (
     StableDiffusionControlNetPipeline,
     StableDiffusionXLControlNetPipeline,
     ControlNetModel,
+    AutoencoderKL,
 )
 from diffusers import (
     DDPMScheduler, 
@@ -68,6 +69,8 @@ if opt.t2i_model == "SD1.5":
 		controlnet = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_normalbae", variant="fp16", torch_dtype=torch.float16)
 	elif opt.cond_type == "depth":
 		controlnet = ControlNetModel.from_pretrained("lllyasviel/control_v11f1p_sd15_depth", variant="fp16", torch_dtype=torch.float16)
+	elif opt.cond_type == "canny":
+		controlnet = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_canny", variant="fp16", torch_dtype=torch.float16)
 	else:
 		ValueError(f"Condition {opt.cond_type} is not supported")	
 
@@ -83,15 +86,19 @@ elif opt.t2i_model == "SDXL":
     
 	if opt.cond_type == "depth":
 		controlnet = ControlNetModel.from_pretrained("xinsir/controlnet-depth-sdxl-1.0", torch_dtype=torch.float16)
+	elif opt.cond_type == "canny":
+		#controlnet = ControlNetModel.from_pretrained("xinsir/controlnet-canny-sdxl-1.0", torch_dtype=torch.float16)
+		controlnet = ControlNetModel.from_pretrained("diffusers/controlnet-canny-sdxl-1.0", torch_dtype=torch.float16)
 	else:
 		ValueError(f"Condition {opt.cond_type} is not supported")
 
+	vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
 	pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
-		"stabilityai/stable-diffusion-xl-base-1.0", controlnet=controlnet, torch_dtype=torch.float16
+		"stabilityai/stable-diffusion-xl-base-1.0", vae=vae, controlnet=controlnet, torch_dtype=torch.float16
 	)
 
 	#pipe.scheduler = DDIMScheduler.from_config(pipe.scheduler.config)
-	#pipe.scheduler = DDPMScheduler.from_config(pipe.scheduler.config)
+	pipe.scheduler = DDPMScheduler.from_config(pipe.scheduler.config)
 
 	syncmvd = StableSyncMVDPipelineXL(**pipe.components)
 

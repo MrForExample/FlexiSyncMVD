@@ -3,6 +3,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from PIL import Image
 from IPython.display import display
 import numpy as np
+import cv2
 import math
 import random
 import torch
@@ -45,6 +46,23 @@ color_constants = {"black": [-1, -1, -1], "white": [1, 1, 1], "maroon": [0, -1, 
 			"purple": [0, -1 , 0], "fuchsia": [1, -1, 1]}
 color_names = list(color_constants.keys())
 
+def HWC3(x):
+    assert x.dtype == np.uint8
+    if x.ndim == 2:
+        x = x[:, :, None]
+    assert x.ndim == 3
+    H, W, C = x.shape
+    assert C == 1 or C == 3 or C == 4
+    if C == 3:
+        return x
+    if C == 1:
+        return np.concatenate([x, x, x], axis=2)
+    if C == 4:
+        color = x[:, :, 0:3].astype(np.float32)
+        alpha = x[:, :, 3:4].astype(np.float32) / 255.0
+        y = color * alpha + 255.0 * (1.0 - alpha)
+        y = y.clip(0, 255).astype(np.uint8)
+        return y
 
 # Used to generate depth or normal conditioning images
 @torch.no_grad()
@@ -57,7 +75,7 @@ def get_conditioning_images(uvp, output_size, render_size=512, blur_filter=5, co
 		GaussianBlur(blur_filter, blur_filter//3+1)]
 	)
 
-	if cond_type == "normal":
+	if cond_type == "normal" or cond_type == "canny":
 		view_normals = uvp.decode_view_normal(normals).permute(0,3,1,2) *2 - 1
 		conditional_images = normals_transforms(view_normals)
 	# Some problem here, depth controlnet don't work when depth is normalized
@@ -430,7 +448,35 @@ class StableSyncMVDPipeline(StableDiffusionControlNetPipeline):
 		self.uvp.to(self._execution_device)
 		conditioning_images, masks = get_conditioning_images(self.uvp, height, cond_type=cond_type)
 		conditioning_images = conditioning_images.type(prompt_embeds.dtype)
+  
 		cond = (conditioning_images/2+0.5).permute(0,2,3,1).cpu().numpy()
+		list_pil = numpy_to_pil(cond)
+		for i, img in enumerate(list_pil):
+			img.save(f"{self.intermediate_dir}/cond_normal_{i}.jpg")
+
+		if cond_type == "canny":
+			controlnet_img = (cond*255).astype(np.uint8)
+			canny_img_list = []
+			for img in controlnet_img:
+				canny_img = cv2.Canny(img, 100, 200)
+				canny_img = HWC3(canny_img)
+				canny_img = Image.fromarray(canny_img)
+				canny_img_list.append(canny_img)
+    
+				conditioning_images = self.prepare_image(
+					image=canny_img_list,
+					width=width,
+					height=height,
+					batch_size=batch_size * num_images_per_prompt,
+					num_images_per_prompt=num_images_per_prompt,
+					device=device,
+					dtype=controlnet.dtype,
+					do_classifier_free_guidance=do_classifier_free_guidance,
+					guess_mode=guess_mode,
+				)
+
+			cond = np.stack(canny_img_list, axis=0).astype(np.float32) / 255
+
 		cond = np.concatenate([img for img in cond], axis=1)
 		numpy_to_pil(cond)[0].save(f"{self.intermediate_dir}/cond.jpg")
 
