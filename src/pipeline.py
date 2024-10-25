@@ -47,22 +47,22 @@ color_constants = {"black": [-1, -1, -1], "white": [1, 1, 1], "maroon": [0, -1, 
 color_names = list(color_constants.keys())
 
 def HWC3(x):
-    assert x.dtype == np.uint8
-    if x.ndim == 2:
-        x = x[:, :, None]
-    assert x.ndim == 3
-    H, W, C = x.shape
-    assert C == 1 or C == 3 or C == 4
-    if C == 3:
-        return x
-    if C == 1:
-        return np.concatenate([x, x, x], axis=2)
-    if C == 4:
-        color = x[:, :, 0:3].astype(np.float32)
-        alpha = x[:, :, 3:4].astype(np.float32) / 255.0
-        y = color * alpha + 255.0 * (1.0 - alpha)
-        y = y.clip(0, 255).astype(np.uint8)
-        return y
+	assert x.dtype == np.uint8
+	if x.ndim == 2:
+		x = x[:, :, None]
+	assert x.ndim == 3
+	H, W, C = x.shape
+	assert C == 1 or C == 3 or C == 4
+	if C == 3:
+		return x
+	if C == 1:
+		return np.concatenate([x, x, x], axis=2)
+	if C == 4:
+		color = x[:, :, 0:3].astype(np.float32)
+		alpha = x[:, :, 3:4].astype(np.float32) / 255.0
+		y = color * alpha + 255.0 * (1.0 - alpha)
+		y = y.clip(0, 255).astype(np.uint8)
+		return y
 
 # Used to generate depth or normal conditioning images
 @torch.no_grad()
@@ -462,7 +462,7 @@ class StableSyncMVDPipeline(StableDiffusionControlNetPipeline):
 				canny_img = HWC3(canny_img)
 				canny_img = Image.fromarray(canny_img)
 				canny_img_list.append(canny_img)
-    
+
 				conditioning_images = self.prepare_image(
 					image=canny_img_list,
 					width=width,

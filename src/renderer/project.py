@@ -234,7 +234,7 @@ class UVProjection():
 			faces_per_pixel=face_per_pix,
 			perspective_correct=perspective_correct,
 			cull_backfaces=True,
-			max_faces_per_bin=30000,
+			max_faces_per_bin=50000,
 		)
 
 		self.renderer = MeshRenderer(
@@ -390,8 +390,8 @@ class UVProjection():
 			faces_per_pixel=1,
 			perspective_correct=False,
 			cull_backfaces=False,
-			max_faces_per_bin=30000,
-			)
+			max_faces_per_bin=50000,
+		)
 
 		R, T = look_at_view_transform(dist=2, elev=0, azim=0)
 		cameras = FoVOrthographicCameras(device=self.device, R=R, T=T)

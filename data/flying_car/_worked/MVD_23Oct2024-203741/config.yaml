@@ -1,0 +1,13 @@
+mesh: "./free_merc_hovercar_normalized.glb"
+mesh_config_relative: True    # mesh is placed relative to the config file
+use_mesh_name: False
+t2i_model: "SDXL" # "SD1.5", "SDXL"
+prompt: "A pink metal flying car with black window on each side of the car door, futuristic cyberpunk style, pure grey background, detailed, 8k"
+steps: 30
+guidance_scale: 7.5
+cond_type: "canny" # "canny", "normal", "depth"
+seed: 1234
+log_interval: 10
+mesh_scale: 1
+tex_fast_preview: True
+view_fast_preview: True

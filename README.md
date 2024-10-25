@@ -1,18 +1,6 @@
-# SyncMVD
+# FlexiSyncMVD
 
-Official [Pytorch](https://pytorch.org/) & [Diffusers](https://github.com/huggingface/diffusers) implementation of the paper:
-
-
-
-**[Text-Guided Texturing by Synchronized Multi-View Diffusion](https://arxiv.org/pdf/2311.12891)**
-
-<!-- Authors: Yuxin Liu, Minshan Xie, Hanyuan Liu, Tien-Tsin Wong -->
-
-<img src=assets/teaser.jpg width=768>
-
-**SyncMVD** can generate texture for a 3D object from a text prompt using a **Sync**hronized **M**ulti-**V**iew **D**iffusion approach.
-The method shares the denoised content among different views in each denoising step to ensure texture consistency and avoid seams and fragmentation (fig a).
-
+Generate, modify texture for a 3D object from a text or image prompt.
 
 
 <table style="table-layout: fixed; width: 100%;">
@@ -125,32 +113,29 @@ The pretrained models will be downloaded automatically on demand, including:
 - [lllyasviel/control_v11f1p_sd15_depth](lllyasviel/control_v11f1p_sd15_depth)
 - [lllyasviel/control_v11p_sd15_normalbae](https://huggingface.co/lllyasviel/control_v11p_sd15_normalbae) 
 
-## Data :floppy_disk:
+## Data
 The current program based on [PyTorch3D](https://github.com/facebookresearch/pytorch3d) library requires a input `.obj` mesh with `.mtl` material and related textures to read the original UV mapping of the object, which may require manual cleaning. Alternatively the program also support auto unwrapping based on [XAtlas](https://github.com/jpcy/xatlas) to load mesh that does not met the above requirements. The program also supports loading `.glb` mesh, but it may not be stable as its a PyTorch3D experiment feature.
 
 To avoid unexpected artifact, the object being textured should avoid flipped face normals and overlapping UV, and keep the number of triangle faces within around 40,000. You can try [Blender](https://www.blender.org/) for manual mesh cleaning and processing, or its python scripting for automation.
 
 You can try out the method with the following pre-processed meshes and configs:
-- [Face - "Portrait photo of Kratos, god of war."](data/face/config.yaml) (by [2on](https://sketchfab.com/3d-models/face-ffde29cb64584cf1a939ac2b58d0a931))
-- [Sneaker - "A photo of a camouflage military boot."](data/sneaker/config.yaml) (by [gianpego](https://sketchfab.com/3d-models/air-jordan-1-1985-2614cef9a3724ec5852144446fbb726f))
+- [Flying Car](data/flying_car/config.yaml)
+- [Monster](data/monster/config.yaml)
+- [Cammy](data/monster/cammy.yaml)
 
-## Inference :rocket:
+## Inference
 ```bash
-python run_experiment.py --config {your config}.yaml
+python main.py --config {your config}.yaml
 ```
 Refer to [config.py](src/configs.py) for the list of arguments and settings you can adjust. You can change these settings by including them in a `.yaml` config file or passing the related arguments in command line; values specified in command line will overwrite those in config files.
 
 When no output path is specified, the generated result will be placed in the same folder as the config file by default.
 
-## License :scroll:
-The program licensed under [MIT License](LICENSE).
+## Reference
+[Pytorch](https://pytorch.org/) & [Diffusers](https://github.com/huggingface/diffusers) implemetation base on the paper:
 
-## Citation :memo:
-```bibtex
-@article{liu2023text,
-  title={Text-Guided Texturing by Synchronized Multi-View Diffusion},
-  author={Liu, Yuxin and Xie, Minshan and Liu, Hanyuan and Wong, Tien-Tsin},
-  journal={arXiv preprint arXiv:2311.12891},
-  year={2023}
-}
-```
+- **[Text-Guided Texturing by Synchronized Multi-View Diffusion](https://arxiv.org/pdf/2311.12891)**
+
+- **[SyncTweedies: A General Generative Framework Based on Synchronized Diffusions](https://arxiv.org/abs/2403.14370)**
+
+- **[FlexiTex: Enhancing Texture Generation via Visual Guidance](https://arxiv.org/abs/2409.12431)**
