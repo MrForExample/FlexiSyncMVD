@@ -1,0 +1,9 @@
+*/__pycache__/
+*.pyc
+/assets/*.py
+/assets/*.mp4
+/data/*/_exp/
+/data/*/_mesh_data/
+/_test/_outputs/
+*.safetensors
+*.ckpt

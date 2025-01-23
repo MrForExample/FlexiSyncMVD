@@ -1,0 +1,134 @@
+# Blender 4.2.3 LTS MTL File: 'Marcille.blend'
+# www.blender.org
+
+newmtl CommonAnimeMouth
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_3.png
+
+newmtl CommonAnimeTongue
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_4.png
+
+newmtl MarcilleBody
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_9.png
+
+newmtl MarcilleBrow
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_2.png
+
+newmtl MarcilleHair.001
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_8.png
+
+newmtl MarcilleHem
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_7.png
+
+newmtl MarcilleIris
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_1.png
+
+newmtl MarcilleLash
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_2.png
+
+newmtl MarcillePants
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_6.png
+
+newmtl MarcilleSclera
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_0.png
+
+newmtl MarcilleShirt
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_5.png
+
+newmtl Material.002
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Marcille_all_UVs_textures/Image_9.png

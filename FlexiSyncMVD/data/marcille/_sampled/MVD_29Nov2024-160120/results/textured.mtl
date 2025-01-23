@@ -1,0 +1,144 @@
+newmtl Material.002
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_9.png
+
+newmtl MarcilleBody
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_9.png
+
+newmtl MarcilleSclera
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_0.png
+
+newmtl MarcilleIris
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_1.png
+
+newmtl MarcilleLash
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_2.png
+
+newmtl MarcilleBrow
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_2.png
+
+newmtl CommonAnimeMouth
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_3.png
+
+newmtl CommonAnimeTongue
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_4.png
+
+newmtl MarcilleShirt
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_5.png
+
+newmtl MarcillePants
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_6.png
+
+newmtl MarcilleHem
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_7.png
+
+newmtl MarcilleHair.001
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.0
+illum 2
+Pr 0.500000
+Pm 0.000000
+map_Kd Image_8.png
+

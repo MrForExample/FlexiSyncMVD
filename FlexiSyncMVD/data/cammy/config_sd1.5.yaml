@@ -1,0 +1,15 @@
+mesh: "./Cammy_Normalized_no_color.glb"
+mesh_config_relative: True    # mesh is placed relative to the config file
+use_mesh_name: False
+t2i_model: "SD1.5" # "SD1.5", "SDXL"
+prompt: "Cammy from Street Fighter, she wears a tight green V shape bodysuit, bare skin legs from feet to thighs with no pants to cover it. A red beret with a black star tops her head, and she has long blonde braids. Her red combat gauntlets and piercing blue eyes emphasize her readiness for battle, detailed, 8k"
+steps: 30
+cond_type: "depth" # "canny", "normal", "depth"
+seed: 4399171738989
+log_interval: 10
+mesh_scale: 0.9
+tex_fast_preview: True
+view_fast_preview: True
+keep_mesh_uv: True
+conditioning_scale: 0.3
+conditioning_scale_end: 0.7

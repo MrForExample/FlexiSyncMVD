@@ -1,6 +1,8 @@
 # pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu121
 # pip install -U xformers==0.0.27.post2 --index-url https://download.pytorch.org/whl/cu121
 # pip install git+https://github.com/openai/CLIP.git
+
+# Pipeline Requirements
 accelerate
 configargparse
 cupy-cuda12x
@@ -15,3 +17,11 @@ safetensors
 transformers
 xatlas
 ipython
+iopath
+trimesh
+# API Requirements
+fastapi[standard]
+pydantic
+pydantic-settings
+boto3
+pygltflib

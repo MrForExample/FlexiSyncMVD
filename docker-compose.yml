@@ -1,0 +1,50 @@
+services:
+  syncmvd:
+    image: syncmvd
+    build:
+      context: .
+      dockerfile: Dockerfile
+    runtime: nvidia
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_DISABLE_REQUIRE=1
+    volumes:
+      - ./hfcache/hub:/root/.cache/huggingface/hub
+      - ./FlexiSyncMVD/_checkpoints:/app/FlexiSyncMVD/_checkpoints
+    profiles:
+      - full
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - local
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./ci/init.sh:/init.sh
+      - ./ci/examples:/examples
+    entrypoint: /init.sh
+    profiles:
+      - local

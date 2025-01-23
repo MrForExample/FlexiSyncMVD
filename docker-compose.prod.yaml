@@ -1,0 +1,48 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.httpChallenge.entryPoint=web"
+      - "--certificatesresolvers.le.acme.httpChallenge=true"
+      - "--certificatesresolvers.le.acme.email=carlos@sortium.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+
+  syncmvd:
+    image: syncmvd:latest
+    runtime: nvidia
+    ports:
+      - "8100:8000"
+    env_file:
+      - .env
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_DISABLE_REQUIRE=1
+    volumes:
+      - ./hfcache/hub:/root/.cache/huggingface/hub
+      - ./FlexiSyncMVD/_checkpoints:/app/FlexiSyncMVD/_checkpoints
+    command: ["uv", "run", "server.js"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncmvd.rule=Host(`preview.sortium.com`)"
+      - "traefik.http.routers.syncmvd.entrypoints=websecure"
+      - "traefik.http.routers.syncmvd.tls=true"
+      - "traefik.http.routers.syncmvd.tls.certresolver=le"
+      - "traefik.http.services.syncmvd.loadbalancer.server.port=8000"

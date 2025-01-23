@@ -1,0 +1,16 @@
+mesh: "./Monster_Normalized.glb"
+mesh_config_relative: True    # mesh is placed relative to the config file
+use_mesh_name: False
+t2i_model: "SDXL" # "SD1.5", "SDXL"
+prompt: "A massive lava monster in the shape of Godzilla, its body is formed of molten rock, with glowing cracks of fiery lava running through its skin. The monster's eyes burn bright like molten embers, smoke and steam rise from its jagged, rock-like spines, which glow with intense heat, detailed, 8k"
+steps: 30
+cond_type: "depth" # "canny", "normal", "depth"
+seed: 9696
+log_interval: 10
+mesh_scale: 0.9
+tex_fast_preview: True
+view_fast_preview: True
+latent_view_size: 128
+latent_tex_size: 1024
+rgb_view_size: 1024
+rgb_tex_size: 1280

@@ -1,0 +1,23 @@
+mesh: "./Cammy_Normalized_no_color.glb"
+mesh_config_relative: True    # mesh is placed relative to the config file
+use_mesh_name: False
+t2i_model: "SDXL" # "SD1.5", "SDXL"
+checkpoint_path: "./FlexiSyncMVD/_checkpoints/juggernautXL_juggXIByRundiffusion.safetensors"
+prompt: "1girl, Cammy white, Street Fighter, smooth legs, smooth thighs, no pants, no socks, short red ankle boots, green V shape upper bodysuit, red beret with a black star, blonde braids, black combat gauntlets, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"
+negative_prompt: "nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
+steps: 30
+cond_type: "depth" # "canny", "normal", "depth"
+seed: 4399171738989
+ip_adapter_image: "./_test/cammy_style_ref_test_realistic.png"
+ip_adapter_scale: 0.5
+log_interval: 10
+mesh_scale: 0.9
+tex_fast_preview: True
+view_fast_preview: False
+keep_mesh_uv: True
+latent_view_size: 128
+latent_tex_size: 1024
+rgb_view_size: 1024
+rgb_tex_size: 1280
+conditioning_scale: 0.3
+conditioning_scale_end: 0.7
