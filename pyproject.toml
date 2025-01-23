@@ -1,7 +1,7 @@
 [project]
 name = "flexisyncmvd"
 version = "0.1.0"
-description = "Sortium Texture Pipeline built on top of FlexiSyncMVD"
+description = "Texture Pipeline built on top of FlexiSyncMVD"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -88,7 +88,7 @@ exclude = [
 ]
 
 include = [
-	"sortium/**/*.py",
+	"server_demo/**/*.py",
 	"server.py",
 	"demo.py"
 ]

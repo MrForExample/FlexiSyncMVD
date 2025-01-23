@@ -45,7 +45,7 @@ RUN uv pip install --no-build-isolation "git+https://github.com/facebookresearch
 
 # Copy the project files into the container
 COPY ./FlexiSyncMVD /app/FlexiSyncMVD
-COPY ./sortium /app/sortium
+COPY ./server_demo /app/server_demo
 COPY ./server.py /app/server.py
 
 # Expose port 8000

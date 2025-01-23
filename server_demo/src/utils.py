@@ -7,7 +7,7 @@ import boto3
 from typing import Optional
 from botocore.config import Config
 from botocore.exceptions import ClientError
-from sortium.src.logger import logger
+from server_demo.src.logger import logger
 
 
 def create_s3_client(

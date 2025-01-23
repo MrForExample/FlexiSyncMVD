@@ -18,7 +18,7 @@ from diffusers.utils import load_image
 
 from FlexiSyncMVD.src.pipeline import StableSyncMVDPipeline
 from FlexiSyncMVD.src.pipeline_XL import StableSyncMVDPipelineXL
-from sortium.src.custom_types import (
+from server_demo.src.custom_types import (
     InputConfig,
     LoggingConfig,
     PipelineConfig,

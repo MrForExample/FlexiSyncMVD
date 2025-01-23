@@ -19,8 +19,8 @@ from diffusers import (
     UNet2DConditionModel,
 )
 from demo import build_gradio_ui
-from sortium.src.logger import configure_logger, logger
-from sortium.src.custom_types import (
+from server_demo.src.logger import configure_logger, logger
+from server_demo.src.custom_types import (
     CPUInfo,
     GPUInfo,
     InputConfig,
@@ -32,15 +32,15 @@ from sortium.src.custom_types import (
     SystemDetails,
     TextureOutput,
 )
-from sortium.src.model import (
+from server_demo.src.model import (
     preload_controlnet,
     preload_custom_checkpoint,
     preload_generic_vae,
     preload_pipeline,
     run_experiment,
 )
-from sortium.src.settings import Settings
-from sortium.src.utils import (
+from server_demo.src.settings import Settings
+from server_demo.src.utils import (
     create_s3_client,
     download_file,
     download_image_to_tmp,
@@ -189,13 +189,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Sortium Texture Pipeline",
+    title="Server Texture Pipeline",
     description="A pipeline for creating texture maps from 3D models.",
     version=settings.version,
     lifespan=lifespan,
 )
 
-gradio_blocks = build_gradio_ui(theme="sortium", api_url="http://127.0.0.1:8000")
+gradio_blocks = build_gradio_ui(theme="server_demo", api_url="http://127.0.0.1:8000")
 app = gr.mount_gradio_app(app=app, blocks=gradio_blocks, path="/demo")
 
 

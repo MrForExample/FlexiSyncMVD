@@ -8,7 +8,7 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.le.acme.httpChallenge.entryPoint=web"
       - "--certificatesresolvers.le.acme.httpChallenge=true"
-      - "--certificatesresolvers.le.acme.email=carlos@sortium.com"
+      - "--certificatesresolvers.le.acme.email=realmrforexample@gmail.com"
       - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
@@ -41,7 +41,7 @@ services:
               capabilities: [gpu]
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.syncmvd.rule=Host(`preview.sortium.com`)"
+      - "traefik.http.routers.syncmvd.rule=Host(`preview.server_demo.com`)"
       - "traefik.http.routers.syncmvd.entrypoints=websecure"
       - "traefik.http.routers.syncmvd.tls=true"
       - "traefik.http.routers.syncmvd.tls.certresolver=le"

@@ -64,4 +64,4 @@ def configure_logger():
     dictConfig(log_config)
 
 
-logger = logging.getLogger("sortium-mesh-generation")
+logger = logging.getLogger("server_demo-mesh-generation")

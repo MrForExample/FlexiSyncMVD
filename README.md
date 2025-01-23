@@ -107,7 +107,7 @@ sudo ubuntu-drivers list
 sudo ubuntu-drivers install
 
 # Conda Python Environment
-git clone https://github.com/Sortium-io/FlexiSyncMVD.git
+git clone https://github.com/MrForExample/FlexiSyncMVD.git
 cd FlexiSyncMVD
 conda create -n FlexiSyncMVD python=3.11
 conda activate FlexiSyncMVD

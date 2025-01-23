@@ -1,6 +1,6 @@
-# Sortium Pipeline
+# Server Texture Pipeline
 
-This repository contains the code for the Sortium pipeline, built on top of FlexiSyncMVD. The pipeline is designed to be modular and flexible, allowing for easy integration of new models and datasets. The following technologies are included within the current implementation:
+This repository contains the code for the Server Texture pipeline, built on top of FlexiSyncMVD. The pipeline is designed to be modular and flexible, allowing for easy integration of new models and datasets. The following technologies are included within the current implementation:
 
 - **UV**: A tool runner and dependency manager for Python projects.
 - **FastAPI**: A modern, fast (high-performance), web framework for building APIs with Python 3.6+ based on standard Python type hints.
@@ -27,14 +27,14 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ```
 
 
-There multiple other ways to install `uv`, like `brew` or `cargo`, you can find detailed instructions at <https://github.com/Sortium-io/FlexiSyncMVD.git>.
+There multiple other ways to install `uv`, like `brew` or `cargo`, you can find detailed instructions at <https://github.com/MrForExample/FlexiSyncMVD.git>.
 
 ### Project Setup
 
 Clone the repository at the desired location:
 
 ```bash
-git clone https://github.com/Sortium-io/FlexiSyncMVD.git
+git clone https://github.com/MrForExample/FlexiSyncMVD.git
 ```
 
 Navigate to the repository directory:
@@ -140,7 +140,7 @@ This request should generate a response similar to this:
 {
   "status": "success",
   "output_dir": "/tmp/tmple_ww7ni/_exp/MVD_21Nov2024-132758",
-  "generated_mesh": "https://sortium-ai-uploads-bucket.nyc3.digitaloceanspaces.com/6c23d011-8545-4b25-8ac0-33b4821b6b4a.glb"
+  "generated_mesh": "https://server_demo-ai-uploads-bucket.nyc3.digitaloceanspaces.com/6c23d011-8545-4b25-8ac0-33b4821b6b4a.glb"
 }
 ```
 
@@ -216,7 +216,7 @@ You can also run a local S3 service using MinIO. You can start the MinIO service
 docker compose --profile local up -d
 ```
 
-This will start the MinIO service in the background, and create a new bucket called `sortium` contained some example objects that you can use to make requests. The access credentials are the same as the ones defined inside the `.env.example` file.
+This will start the MinIO service in the background, and create a new bucket called `server_demo` contained some example objects that you can use to make requests. The access credentials are the same as the ones defined inside the `.env.example` file.
 
 ## Example Requests
 
@@ -247,7 +247,7 @@ Expected response:
 {
   "status": "success",
   "output_dir": "/tmp/tmplwbt1jll/_exp/MVD_21Nov2024-150212",
-  "generated_mesh": "http://localhost:9000/sortium/c59102ed-6fc2-4cc4-b219-6972e4396a94.glb"
+  "generated_mesh": "http://localhost:9000/server_demo/c59102ed-6fc2-4cc4-b219-6972e4396a94.glb"
 }
 ```
 

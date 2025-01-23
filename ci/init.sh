@@ -3,7 +3,7 @@
 set -e
 
 # Configuration
-BUCKET_NAME="sortium"
+BUCKET_NAME="server_demo"
 MINIO_HOST="minio:9000"
 ACCESS_KEY="minioadmin"
 SECRET_KEY="minioadmin"

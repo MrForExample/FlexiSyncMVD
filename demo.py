@@ -4,11 +4,11 @@ from gradio.themes.utils import fonts
 import httpx
 from tempfile import NamedTemporaryFile
 
-from sortium.src.custom_types import InputConfig, TextureOutput
+from server_demo.src.custom_types import InputConfig, TextureOutput
 
 
-def configure_sortium_theme() -> gr.themes.Base | str:
-    sortium_theme: gr.themes.Base = gr.themes.Soft(
+def configure_server_demo_theme() -> gr.themes.Base | str:
+    server_demo_theme: gr.themes.Base = gr.themes.Soft(
         font=[
             fonts.GoogleFont("Inter"),
             "ui-sans-serif",
@@ -16,7 +16,7 @@ def configure_sortium_theme() -> gr.themes.Base | str:
         ]
     )
     # .set(body_background_fill="#000000", block_background_fill="#000000")
-    return sortium_theme
+    return server_demo_theme
 
 
 def run_pipeline(
@@ -103,12 +103,12 @@ def build_gradio_ui(
     theme: Optional[gr.themes.Base | str] = "soft", api_url: Optional[str] = None
 ) -> gr.Blocks:
     """
-    Build the Gradio UI for the Sortium Texture Pipeline
+    Build the Gradio UI for the  Texture Pipeline
 
     Args:
 
     - theme: Gradio theme to use for the UI
-    - api_url: URL of the Sortium API
+    - api_url: URL of the  API
 
     Returns:
 
@@ -118,17 +118,17 @@ def build_gradio_ui(
     if not api_url:
         raise ValueError("API URL cannot be empty")
 
-    if type(theme) is str and theme.lower() == "sortium":
-        theme = configure_sortium_theme()
+    if type(theme) is str and theme.lower() == "server_demo":
+        theme = configure_server_demo_theme()
 
     with gr.Blocks(
-        theme=theme, fill_width=False, title="Sortium Texture Pipeline"
+        theme=theme, fill_width=False, title=" Texture Pipeline"
     ) as demo:
         gr.Markdown(
             """
-            # __SORTIUM__ Texture Pipeline
+            # Texture Pipeline
 
-            Demo application to showcase the State of the Art Sortium Texture Generation System for industry standard 3d mesh.
+            Demo application to showcase the State of the Art Texture Generation System for industry standard 3d mesh.
             """
         )
         base_url = gr.Label(label="API URL", value=api_url, visible=False)
@@ -241,7 +241,7 @@ def build_gradio_ui(
 
 if __name__ == "__main__":
     demo: gr.Blocks = build_gradio_ui(
-        theme=configure_sortium_theme(), api_url="http://localhost:8000"
+        theme=configure_server_demo_theme(), api_url="http://localhost:8000"
     )
     demo.queue()
     demo.launch(
