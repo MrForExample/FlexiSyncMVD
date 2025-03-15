@@ -701,6 +701,7 @@ class UVProjection():
             materials = loader._json_data.get("materials", [])
             textures = loader._json_data.get("textures", [])
             images = loader._json_data.get("images", [])
+            buffer_views = loader._json_data.get("bufferViews", [])
 
             i = 0
             v_i_start = 0
@@ -765,17 +766,26 @@ class UVProjection():
                                 texture_json = textures[texture_index]
                                 image_index = texture_json["source"]
                                 image_json = images[image_index]
+                                img_name = f"image_{image_index}"
                                 if "name" in image_json:
-                                    image_name = image_json["name"]
-                                    if image_json["mimeType"] == "image/png":
-                                        image_name += ".png"
-                                    elif image_json["mimeType"] == "image/jpeg":
-                                        image_name += ".jpg"
-                                    else:
-                                        raise ValueError(f"Texture image format not supported for {image_json['mimeType']}, use image/png or image/jpeg")
+                                    img_name = image_json["name"]
+                                elif "bufferView" in image_json:
+                                    buffer_view_index = image_json["bufferView"]
+                                    buffer_view_json = buffer_views[buffer_view_index]
+                                    if "name" in buffer_view_json:
+                                        img_name = buffer_view_json["name"]
 
-                                    image_tensor = loader._get_texture_map_image(image_index)
-                                    all_tex_maps[image_name] = image_tensor
+                                if image_json["mimeType"] == "image/png":
+                                    if not img_name.endswith(".png"):
+                                        img_name += ".png"
+                                elif image_json["mimeType"] == "image/jpeg":
+                                    if not img_name.endswith(".jpg") and not img_name.endswith(".jpeg"):
+                                        img_name += ".jpg"
+                                else:
+                                    raise ValueError(f"Texture image format not supported for {image_json['mimeType']}, use image/png or image/jpeg")
+
+                                image_tensor = loader._get_texture_map_image(image_index)
+                                all_tex_maps[image_name] = image_tensor
                         
                         if material_name is None:
                             material_name = f"new_material_{mesh_index}"
