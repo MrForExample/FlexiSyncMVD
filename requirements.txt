@@ -1,11 +1,15 @@
-# pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu121
-# pip install -U xformers==0.0.27.post2 --index-url https://download.pytorch.org/whl/cu121
-# pip install git+https://github.com/openai/CLIP.git
+# Core Dependencies for PyTorch and CUDA
+torch==2.4.1 --index-url https://download.pytorch.org/whl/cu121
+torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
+xformers==0.0.28.post1 --index-url https://download.pytorch.org/whl/cu121
+cupy-cuda12x
+
+# CLIP for Image and Text Encoding
+git+https://github.com/openai/CLIP.git
 
 # Pipeline Requirements
 accelerate
 configargparse
-cupy-cuda12x
 diffusers
 einops
 huggingface-hub
@@ -19,9 +23,23 @@ xatlas
 ipython
 iopath
 trimesh
+
 # API Requirements
 fastapi[standard]
 pydantic
 pydantic-settings
 boto3
 pygltflib
+
+# Additional Dependencies for PyTorch3D (as specified in installation)
+# Note: PyTorch3D is installed separately via UV or pip in the setup instructions, but we can list it here for completeness
+# pytorch3d==0.7.8 is installed via conda in the original instructions, but for pip compatibility, we can note it
+# Uncomment the following line if installing via pip instead of conda
+# git+https://github.com/facebookresearch/pytorch3d.git@stable
+
+# Server-Specific Dependencies
+uvicorn[standard]  # For running the FastAPI server
+sentry-sdk  # For error tracking (optional, as specified in server.py)
+
+# Additional Utilities
+python-dotenv  # For loading environment variables from .env file
