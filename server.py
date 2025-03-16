@@ -120,6 +120,21 @@ settings = config.server
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    FastAPI Lifespan startup and shutdown event handler.
+
+    This method is called once when the server starts and is responsible for
+    initializing the global state of the application such as loading the AI
+    pipelines and starting the Sentry SDK.
+
+    The method is also responsible for cleaning up the global state when the
+    server is shut down.
+
+    :param app: The FastAPI application instance.
+    :type app: FastAPI
+
+    :raises ValueError: If there is an error loading the AI pipeline.
+    """
     global syncmvd_instance, syncmvd_instance_xl, vae_instance, unet_instance, controlnet_instance, s3_client, gpu_lock, thread_pool, replay_config
 
     logger.info("Starting server...")
@@ -261,6 +276,20 @@ async def generate_texture_s3(input: InputConfig) -> TextureOutput:
 
 async def run_pipeline(input: InputConfig) -> TextureOutput:
     # Check GPU Lock
+    """
+    Run the pipeline to generate a textured mesh based on the input config.
+
+    :param input: The input config
+    :type input: InputConfig
+    :return: The generated textured mesh
+    :rtype: TextureOutput
+
+    This function will check the GPU lock before running the pipeline. If the GPU is busy, it will raise an HTTPException with a status code of 429 and a detail message of "GPU is busy, please try again later."
+
+    If the pipeline fails to run, it will catch the exception and return an HTTPException with a status code of 500 and a detail message of the error message.
+
+    If the pipeline runs successfully, it will return the generated textured mesh as a TextureOutput object.
+    """
     if not gpu_lock.acquire(blocking=False):
         logger.error("GPU is busy, please try again later.")
         raise HTTPException(

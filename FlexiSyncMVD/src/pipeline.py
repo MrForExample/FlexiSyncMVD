@@ -60,6 +60,19 @@ color_names = list(color_constants.keys())
 # Revert time 0 background to time t to composite with time t foreground
 @torch.no_grad()
 def composite_rendered_view(scheduler, backgrounds, foregrounds, masks, t):
+    """
+    Compose rendered views at time t by blending foregrounds with backgrounds given the alpha mask.
+
+    Args:
+        scheduler (Scheduler): Scheduler to sample from.
+        backgrounds (List[Tensor]): List of background image tensors.
+        foregrounds (List[Tensor]): List of foreground image tensors.
+        masks (List[Tensor]): List of alpha mask tensors.
+        t (int): Timestep to composite at.
+
+    Returns:
+        Tensor: Composited images tensor of shape (B, H, W, C)
+    """
     composited_images = []
     for i, (background, foreground, mask) in enumerate(
         zip(backgrounds, foregrounds, masks)
@@ -78,6 +91,17 @@ def composite_rendered_view(scheduler, backgrounds, foregrounds, masks, t):
 # But need more investigation on reducing memory usage
 # Assume it has no possitive effect and use a large "max_batch_size" to skip splitting
 def split_groups(attention_mask, max_batch_size, ref_view=[]):
+    """
+    Split attention mask into micro-batches to fit into a smaller model.
+
+    Args:
+        attention_mask (List[List[int]]): Attention mask for each mesh.
+        max_batch_size (int): Maximum number of elements in each micro-batch.
+        ref_view (List[int], optional): Reference view indices. Defaults to [].
+
+    Returns:
+        List[List[int]]: List of micro-batch information.
+    """
     group_sets = []
     group = set()
     ref_group = set()
@@ -171,6 +195,22 @@ class StableSyncMVDPipeline(StableDiffusionControlNetPipeline):
         max_batch_size=24,
         logging_config=None,
     ):
+        """
+        Initialize the pipeline, including creating the output and intermediate directories, and defining the cameras and attention masks for rendering.
+        
+        Parameters:
+        camera_azims (list of float): The azimuthal angles of the cameras in degrees.
+        camera_centers (list of float): The centers of the cameras in x, y, z coordinates.
+        top_cameras (bool): Whether to add two additional cameras for painting the top surfaces.
+        ref_views (list of int): The indices of the reference views for attention.
+        latent_size (int): The size of the latent space.
+        max_batch_size (int): The maximum batch size for rendering.
+        logging_config (dict): The configuration for logging.
+        
+        Returns:
+        None
+        """
+        
         config = AppConfig.load_config()
         pipeline_config = config.pipeline
         camera_azims = camera_azims or pipeline_config.camera_azims

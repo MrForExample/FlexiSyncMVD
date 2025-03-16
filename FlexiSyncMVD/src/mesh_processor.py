@@ -54,6 +54,14 @@ class MeshProcessor:
 		print(f"UV Projection setup done in {end - start} seconds")
 
 	def HWC3(self, x):
+		"""
+		Convert HxWxC numpy array to HxWx3 format, assuming C is 1 or 3 or 4.
+		
+		* If C is 1, the image is grayscale.
+		* If C is 3, the image is RGB.
+		* If C is 4, the image is RGBA. The alpha channel is used to
+		  compute the color of each pixel as color * alpha + 255.0 * (1.0 - alpha).
+		"""
 		assert x.dtype == np.uint8
 		if x.ndim == 2:
 			x = x[:, :, None]
@@ -74,6 +82,31 @@ class MeshProcessor:
 	# Used to generate depth or normal conditioning images
 	@torch.no_grad()
 	def get_conditioning_images(self, output_size, render_size=512, blur_filter=5, cond_type="depth", render_cam_index=None):
+		"""
+		Generate conditioning images from the mesh.
+
+		Args:
+			output_size: The size of the output image.
+
+			render_size: The size of the rendered image. Defaults to 512.
+
+			blur_filter: The size of the blur filter. Defaults to 5.
+
+			cond_type: The type of conditioning image to generate. Defaults to "depth".
+				"depth": Generate a depth map.
+				"normal": Generate a normal map.
+				"canny": Generate an edge map using the Canny algorithm.
+				"render": Generate a rendered image.
+
+			render_cam_index: The index of the camera to use for rendering. Defaults to None.
+
+		Returns:
+			A tuple of:
+
+				conditioning_images: A tensor of size (B, H, W, 3) containing the conditioning images.
+
+				latent_masks: A tensor of size (B, H, W, 1) containing the masks for the latent images.
+		"""
 		start = timer()
 
 		cond_transforms = Compose([
@@ -119,6 +152,25 @@ class MeshProcessor:
 		return conditioning_images, latent_masks
 	
 	def get_canny_images(self, prepare_image, conditioning_images, width, height, batch_size, num_images_per_prompt, do_classifier_free_guidance, guess_mode, device, dtype):
+		"""
+		Generate Canny edge images from conditioning images and prepare them for use.
+
+		Args:
+			prepare_image: Function to prepare the processed Canny images.
+			conditioning_images: Tensor of conditioning images to process.
+			width: Width of the output images.
+			height: Height of the output images.
+			batch_size: Number of images per batch.
+			num_images_per_prompt: Number of images to generate per prompt.
+			do_classifier_free_guidance: Boolean indicating whether to use classifier-free guidance.
+			guess_mode: Mode of guessing for the guidance.
+			device: Device on which to perform computations.
+			dtype: Data type for the processed images.
+
+		Returns:
+			A tensor containing the prepared Canny edge images.
+		"""
+
 		cond = (conditioning_images/2+0.5).permute(0,2,3,1).cpu().numpy()
 
 		controlnet_img = (cond*255).astype(np.uint8)
@@ -144,6 +196,19 @@ class MeshProcessor:
 		return conditioning_images
 
 	def save_conditioning_images(self, conditioning_images, output_dir, save_each_cond_img=False, cond_type="depth"):
+		"""
+		Save the conditioning images to the output directory.
+
+		Args:
+			conditioning_images: Tensor of the conditioning images to save.
+			output_dir: Directory path to save the images.
+			save_each_cond_img: Boolean indicating whether to save each conditioning
+				image separately.
+			cond_type: Type of the conditioning image ("depth" or "normal").
+
+		Returns:
+			A PIL image containing the saved conditioning images.
+		"""
 		if cond_type == "normal":
 			conditioning_images = conditioning_images/2+0.5
 		cond = conditioning_images.permute(0,2,3,1).cpu().numpy()

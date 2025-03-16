@@ -29,6 +29,25 @@ from app_config import AppConfig
 
 
 def load_pipeline(opt=None, vae=None, controlnet=None, unet=None):
+    """
+    Load a pipeline from the given options and return it.
+
+    Parameters
+    ----------
+    opt : argparse.Namespace, optional
+        Configuration options
+    vae : AutoencoderKL, optional
+        The VAE model to use
+    controlnet : ControlNetModel, optional
+        The control net model to use
+    unet : UNet2DConditionModel, optional
+        The U-Net model to use
+
+    Returns
+    -------
+    syncmvd_instance : StableSyncMVDPipeline or StableSyncMVDPipelineXL
+        The loaded pipeline
+    """
     config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
     pipeline_config = config.pipeline
     syncmvd_instance = None
@@ -106,6 +125,23 @@ def load_pipeline(opt=None, vae=None, controlnet=None, unet=None):
 
 
 def initialize_pipeline(syncmvd_instance, opt=None, logging_config={}):
+    """
+    Initialize the pipeline with the given options and logging config.
+
+    Parameters
+    ----------
+    syncmvd_instance : StableSyncMVDPipeline or StableSyncMVDPipelineXL
+        The pipeline instance to initialize
+    opt : argparse.Namespace, optional
+        The options to use for initialization
+    logging_config : dict, optional
+        The configuration for logging
+
+    Returns
+    -------
+    syncmvd_instance : StableSyncMVDPipeline or StableSyncMVDPipelineXL
+        The initialized pipeline instance
+    """
     config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
     pipeline_config = config.pipeline
     syncmvd_instance.initialize_pipeline(
@@ -120,6 +156,25 @@ def initialize_pipeline(syncmvd_instance, opt=None, logging_config={}):
 
 
 def initialize_mesh_processor(opt=None, mesh_path="", camera_poses=[], device=None):
+    """
+    Initialize the mesh processor with the given options, mesh path and camera poses.
+
+    Parameters
+    ----------
+    opt : argparse.Namespace, optional
+        The options to use for initialization
+    mesh_path : str, optional
+        The path to the mesh file
+    camera_poses : list, optional
+        The camera poses to use for rendering
+    device : torch.device, optional
+        The device to use for the mesh processor
+
+    Returns
+    -------
+    mesh_processor : MeshProcessor
+        The initialized mesh processor
+    """
     config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
     pipeline_config = config.pipeline
     device = device or (
@@ -139,6 +194,19 @@ def initialize_mesh_processor(opt=None, mesh_path="", camera_poses=[], device=No
 
 
 def load_reference_image(opt=None):
+    """
+    Load a reference image from the given options.
+
+    Parameters
+    ----------
+    opt : argparse.Namespace, optional
+        The options to use for loading the reference image
+
+    Returns
+    -------
+    image : PIL.Image or None
+        The loaded reference image, or None if no image is specified
+    """
     config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
     pipeline_config = config.pipeline
     return (
@@ -151,6 +219,31 @@ def load_reference_image(opt=None):
 def run_pipeline(
     syncmvd_instance, mesh_processor, opt=None, logging_config={}, ip_adapter_image=None
 ):
+    """
+    Run the pipeline to generate a textured mesh based on the input config.
+
+    Parameters
+    ----------
+    syncmvd_instance : StableSyncMVDPipeline
+        The instance of the StableSyncMVDPipeline to use
+    mesh_processor : MeshProcessor
+        The mesh processor to use for rendering
+    opt : argparse.Namespace, optional
+        The options to use for the pipeline
+    logging_config : dict, optional
+        The configuration for logging
+    ip_adapter_image : str or None, optional
+        The path to the image to use as an IP adapter
+
+    Returns
+    -------
+    result_tex_rgb : torch.Tensor
+        The generated textured mesh as a 3D tensor of RGB values
+    textured_views : list
+        The rendered RGB images for each view
+    v : torch.Tensor
+        The final latent code for the mesh
+    """
     config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
     pipeline_config = config.pipeline
     result_tex_rgb, textured_views, v = syncmvd_instance(
@@ -182,6 +275,21 @@ def run_pipeline(
 
 
 def load_config(opt=None):
+    """
+    Load configuration from opt and return logging_config and mesh_path
+
+    Parameters
+    ----------
+    opt : argparse.Namespace
+            Configuration options
+
+    Returns
+    -------
+    logging_config : dict
+            Configuration for logging
+    mesh_path : str
+            Path to input mesh
+    """
     config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
     pipeline_config = config.pipeline
     mesh_path = abspath(pipeline_config.mesh)
@@ -224,6 +332,26 @@ def preload_pipeline(
     controlnet: Optional[ControlNetModel] = None,
     unet: Optional[UNet2DConditionModel] = None,
 ) -> StableSyncMVDPipeline | StableSyncMVDPipelineXL:
+    """
+    Preload a pipeline from the given options and return it.
+
+    Parameters
+    ----------
+    t2i_model : str, optional
+        The text-to-image model to use, by default "SDXL"
+    vae : AutoencoderKL, optional
+        The VAE model to use
+    controlnet : ControlNetModel, optional
+        The control net model to use
+    unet : UNet2DConditionModel, optional
+        The U-Net model to use
+
+    Returns
+    -------
+    syncmvd_instance : StableSyncMVDPipeline or StableSyncMVDPipelineXL
+        The loaded pipeline
+    """
+
     opt = PipelineConfig()
     opt.t2i_model = t2i_model
     syncmvd_instance = load_pipeline(opt, vae, controlnet, unet)
@@ -257,6 +385,21 @@ def run_experiment(
     syncmvd_instance: StableSyncMVDPipeline | StableSyncMVDPipelineXL,
     input: InputConfig,
 ):
+    """
+    Run the experiment with the given input configuration.
+
+    Parameters
+    ----------
+    syncmvd_instance : StableSyncMVDPipeline or StableSyncMVDPipelineXL
+        The pipeline to use
+    input : InputConfig
+        The input configuration
+
+    Returns
+    -------
+    str
+        The output directory
+    """
     opt = PipelineConfig()
 
     # Merge input config with default config
