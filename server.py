@@ -39,7 +39,6 @@ from server_demo.src.model import (
     preload_pipeline,
     run_experiment,
 )
-from server_demo.src.settings import Settings
 from server_demo.src.utils import (
     create_s3_client,
     download_file,
@@ -49,12 +48,13 @@ from server_demo.src.utils import (
     is_valid_output_dir,
     upload_file,
 )
+
+from app_config import AppConfig
 import sentry_sdk
 from threading import Lock
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
-settings = Settings()
 
 configure_logger()
 
@@ -114,53 +114,41 @@ def get_system_details() -> SystemDetails:
     )
 
 
+config = AppConfig.load_config()
+settings = config.server
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global syncmvd_instance
-    global syncmvd_instance_xl
-    global vae_instance
-    global unet_instance
-    global controlnet_instance
-    global s3_client
-    global gpu_lock
-    global task_queue
-    global task_status
-    global processing_task
-    global thread_pool
-    global replay_config
+    global syncmvd_instance, syncmvd_instance_xl, vae_instance, unet_instance, controlnet_instance, s3_client, gpu_lock, thread_pool, replay_config
 
     logger.info("Starting server...")
     logger.info("App Settings")
-    logger.info(f"\n{settings.model_dump_json(indent=2)}")
+    logger.info(f"\n{config.server.model_dump_json(indent=2)}")
 
     logger.info("System Details")
     logger.info(f"\n{get_system_details().model_dump_json(indent=2)}")
 
     logger.info("Loading AI pipelines...")
-
     try:
-        if settings.sentry_dsn:
+        if config.server.sentry_dsn:
             logger.info("Starting sentry SDK...")
             sentry_sdk.init(
-                dsn=settings.sentry_dsn.get_secret_value(),
+                dsn=config.server.sentry_dsn,
                 traces_sample_rate=1.0,
-                _experiments={
-                    "continuous_profiling_auto_start": True,
-                },
+                _experiments={"continuous_profiling_auto_start": True},
             )
 
         s3_client = create_s3_client(
-            endpoint_url=settings.s3_endpoint_url,
-            access_key=settings.s3_access_key.get_secret_value(),
-            secret_key=settings.s3_secret_key.get_secret_value(),
-            validate_ssl=settings.s3_validate_ssl,
-            addressing_style=settings.s3_addressing_style,
+            endpoint_url=config.s3.endpoint_url,
+            access_key=config.s3.access_key,
+            secret_key=config.s3.secret_key,
+            validate_ssl=config.s3.validate_ssl,
+            addressing_style=config.s3.addressing_style,
         )
 
         gpu_lock = Lock()
-
         thread_pool = ThreadPoolExecutor()
-
         replay_config = ReplayConfig()
 
         yield
@@ -191,7 +179,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Server Texture Pipeline",
     description="A pipeline for creating texture maps from 3D models.",
-    version=settings.version,
+    version=config.server.version,
     lifespan=lifespan,
 )
 
@@ -211,9 +199,9 @@ async def get_gpu_status() -> GPUInfo:
         memory=format_memory(torch.cuda.get_device_properties(0).total_memory),
         cuda_status="available" if torch.cuda.is_available() else "unavailable",
         cuda_version=torch.version.cuda,
-        gpu_lock_status="locked"
-        if gpu_lock is not None and gpu_lock.locked()
-        else "unlocked",
+        gpu_lock_status=(
+            "locked" if gpu_lock is not None and gpu_lock.locked() else "unlocked"
+        ),
     )
 
 
@@ -391,8 +379,8 @@ async def run_pipeline(input: InputConfig) -> TextureOutput:
                 s3_client=s3_client,
             )
 
-            if settings.s3_bucket_public_url:
-                uploaded_key = f"{settings.s3_bucket_public_url}/{uploaded_key}"
+            if config.s3.bucket_public_url:
+                uploaded_key = f"{config.s3.bucket_public_url}/{uploaded_key}"
 
             output.status = OutputStatus.SUCCESS
             output.generated_mesh = HttpUrl(uploaded_key)
@@ -535,4 +523,4 @@ def print_traceback(traceback: TracebackType):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=config.server.host, port=config.server.port)

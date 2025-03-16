@@ -25,37 +25,35 @@ from server_demo.src.custom_types import (
     merge_configs,
 )
 from FlexiSyncMVD.src.mesh_processor import MeshProcessor
+from app_config import AppConfig
 
 
-def load_pipeline(
-    opt: Optional[PipelineConfig] = PipelineConfig(),
-    vae: Optional[AutoencoderKL] = None,
-    controlnet: Optional[ControlNetModel] = None,
-    unet: Optional[UNet2DConditionModel] = None,
-) -> StableSyncMVDPipeline | StableSyncMVDPipelineXL:
-    syncmvd_instance: StableSyncMVDPipeline = None
+def load_pipeline(opt=None, vae=None, controlnet=None, unet=None):
+    config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
+    pipeline_config = config.pipeline
+    syncmvd_instance = None
 
-    if opt.t2i_model == "SD1.5":
-        if opt.cond_type == "normal":
+    if pipeline_config.t2i_model == "SD1.5":
+        if pipeline_config.cond_type == "normal":
             controlnet = ControlNetModel.from_pretrained(
                 "lllyasviel/control_v11p_sd15_normalbae",
                 variant="fp16",
                 torch_dtype=torch.float16,
             )
-        elif opt.cond_type == "depth":
+        elif pipeline_config.cond_type == "depth":
             controlnet = ControlNetModel.from_pretrained(
                 "lllyasviel/control_v11f1p_sd15_depth",
                 variant="fp16",
                 torch_dtype=torch.float16,
             )
-        elif opt.cond_type == "canny":
+        elif pipeline_config.cond_type == "canny":
             controlnet = ControlNetModel.from_pretrained(
                 "lllyasviel/control_v11p_sd15_canny",
                 variant="fp16",
                 torch_dtype=torch.float16,
             )
         else:
-            ValueError(f"Condition {opt.cond_type} is not supported")
+            raise ValueError(f"Condition {pipeline_config.cond_type} is not supported")
 
         image_encoder = CLIPVisionModelWithProjection.from_pretrained(
             "h94/IP-Adapter",
@@ -71,10 +69,9 @@ def load_pipeline(
         )
 
         pipe.scheduler = DDPMScheduler.from_config(pipe.scheduler.config)
-
         syncmvd_instance = StableSyncMVDPipeline(**pipe.components)
 
-    elif opt.t2i_model == "SDXL":
+    elif pipeline_config.t2i_model == "SDXL":
         image_encoder = CLIPVisionModelWithProjection.from_pretrained(
             "h94/IP-Adapter",
             subfolder="models/image_encoder",
@@ -100,114 +97,109 @@ def load_pipeline(
             )
 
         pipe.scheduler = DDPMScheduler.from_config(pipe.scheduler.config)
-
         syncmvd_instance = StableSyncMVDPipelineXL(**pipe.components)
 
     else:
-        ValueError(f"Model {opt.t2i_model} is not supported")
+        raise ValueError(f"Model {pipeline_config.t2i_model} is not supported")
 
     return syncmvd_instance
 
 
-def initialize_pipeline(
-    syncmvd_instance: StableSyncMVDPipeline,
-    opt: Optional[PipelineConfig] = PipelineConfig(),
-    logging_config: dict = {},
-) -> StableSyncMVDPipeline:
+def initialize_pipeline(syncmvd_instance, opt=None, logging_config={}):
+    config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
+    pipeline_config = config.pipeline
     syncmvd_instance.initialize_pipeline(
-        camera_azims=opt.camera_azims,
-        top_cameras=not opt.no_top_cameras,
+        camera_azims=pipeline_config.camera_azims,
+        top_cameras=not pipeline_config.no_top_cameras,
         ref_views=[],
-        latent_size=opt.latent_view_size,
-        max_batch_size=opt.max_batch_size,
+        latent_size=pipeline_config.latent_view_size,
+        max_batch_size=pipeline_config.max_batch_size,
         logging_config=logging_config,
     )
-
     return syncmvd_instance
 
 
-def initialize_mesh_processor(
-    opt: Optional[PipelineConfig] = PipelineConfig(),
-    mesh_path: str = "",
-    camera_poses: list = [],
-    device: Any = torch.device("cuda")
-    if torch.cuda.is_available()
-    else torch.device("cpu"),
-) -> MeshProcessor:
+def initialize_mesh_processor(opt=None, mesh_path="", camera_poses=[], device=None):
+    config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
+    pipeline_config = config.pipeline
+    device = device or (
+        torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    )
     return MeshProcessor(
-        mesh_path=mesh_path,  # This is the input file
-        mesh_transform={"scale": opt.mesh_scale},
-        mesh_autouv=not opt.keep_mesh_uv,
-        latent_size=opt.latent_view_size,
-        render_rgb_size=opt.rgb_view_size,
-        latent_texture_size=opt.latent_tex_size,
-        texture_rgb_size=opt.rgb_tex_size,
+        mesh_path=mesh_path,
+        mesh_transform={"scale": pipeline_config.mesh_scale},
+        mesh_autouv=not pipeline_config.keep_mesh_uv,
+        latent_size=pipeline_config.latent_view_size,
+        render_rgb_size=pipeline_config.rgb_view_size,
+        latent_texture_size=pipeline_config.latent_tex_size,
+        texture_rgb_size=pipeline_config.rgb_tex_size,
         camera_poses=camera_poses,
         device=device,
     )
 
 
-def load_reference_image(opt: Optional[PipelineConfig] = PipelineConfig()):
-    return load_image(opt.ip_adapter_image) if opt.ip_adapter_image else None
-
-
-def run_pipeline(
-    syncmvd_instance: StableSyncMVDPipeline,
-    mesh_processor: MeshProcessor,
-    opt: Optional[PipelineConfig] = PipelineConfig(),
-    logging_config: dict = {},
-    ip_adapter_image: Optional[str] = None,
-):
-    result_tex_rgb, textured_views, v = syncmvd_instance(
-        prompt=opt.prompt,
-        height=opt.latent_view_size * 8,
-        width=opt.latent_view_size * 8,
-        num_inference_steps=opt.steps,
-        guidance_scale=opt.guidance_scale,
-        negative_prompt=opt.negative_prompt,
-        ip_adapter_image=ip_adapter_image,
-        ip_adapter_scale=opt.ip_adapter_scale,
-        generator=torch.manual_seed(opt.seed),
-        controlnet_guess_mode=opt.guess_mode,
-        controlnet_conditioning_scale=opt.conditioning_scale,
-        controlnet_conditioning_end_scale=opt.conditioning_scale_end,
-        control_guidance_start=opt.control_guidance_start,
-        control_guidance_end=opt.control_guidance_end,
-        guidance_rescale=opt.guidance_rescale,
-        mesh_processor=mesh_processor,
-        multiview_diffusion_end=opt.mvd_end,
-        exp_start=opt.mvd_exp_start,
-        exp_end=opt.mvd_exp_end,
-        ref_attention_end=opt.ref_attention_end,
-        shuffle_background_change=opt.shuffle_bg_change,
-        shuffle_background_end=opt.shuffle_bg_end,
-        logging_config=logging_config,
-        cond_type=opt.cond_type,
+def load_reference_image(opt=None):
+    config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
+    pipeline_config = config.pipeline
+    return (
+        load_image(pipeline_config.ip_adapter_image)
+        if pipeline_config.ip_adapter_image
+        else None
     )
 
 
-def load_config(
-    opt: Optional[PipelineConfig] = PipelineConfig(),
-) -> tuple[LoggingConfig, str]:
-    mesh_path = abspath(opt.mesh)
+def run_pipeline(
+    syncmvd_instance, mesh_processor, opt=None, logging_config={}, ip_adapter_image=None
+):
+    config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
+    pipeline_config = config.pipeline
+    result_tex_rgb, textured_views, v = syncmvd_instance(
+        prompt=pipeline_config.prompt,
+        height=pipeline_config.latent_view_size * 8,
+        width=pipeline_config.latent_view_size * 8,
+        num_inference_steps=pipeline_config.steps,
+        guidance_scale=pipeline_config.guidance_scale,
+        negative_prompt=pipeline_config.negative_prompt,
+        ip_adapter_image=ip_adapter_image,
+        ip_adapter_scale=pipeline_config.ip_adapter_scale,
+        generator=torch.manual_seed(pipeline_config.seed),
+        controlnet_guess_mode=pipeline_config.guess_mode,
+        controlnet_conditioning_scale=pipeline_config.conditioning_scale,
+        controlnet_conditioning_end_scale=pipeline_config.conditioning_scale_end,
+        control_guidance_start=pipeline_config.control_guidance_start,
+        control_guidance_end=pipeline_config.control_guidance_end,
+        guidance_rescale=pipeline_config.guidance_rescale,
+        mesh_processor=mesh_processor,
+        multiview_diffusion_end=pipeline_config.mvd_end,
+        exp_start=pipeline_config.mvd_exp_start,
+        exp_end=pipeline_config.mvd_exp_end,
+        ref_attention_end=pipeline_config.ref_attention_end,
+        shuffle_background_change=pipeline_config.shuffle_bg_change,
+        shuffle_background_end=pipeline_config.shuffle_bg_end,
+        logging_config=logging_config,
+        cond_type=pipeline_config.cond_type,
+    )
 
-    if opt.output:
-        output_root = abspath(opt.output)
-    else:
-        # Save to tmp directory
-        temp_dir = tempfile.NamedTemporaryFile().name
-        output_root = abspath(temp_dir)
 
+def load_config(opt=None):
+    config = AppConfig.load_config(pipeline_overrides=vars(opt) if opt else None)
+    pipeline_config = config.pipeline
+    mesh_path = abspath(pipeline_config.mesh)
+    output_root = (
+        abspath(pipeline_config.output)
+        if pipeline_config.output
+        else tempfile.NamedTemporaryFile().name
+    )
     output_name_components = []
-    if opt.prefix and opt.prefix != "":
-        output_name_components.append(opt.prefix)
-    if opt.use_mesh_name:
+    if pipeline_config.prefix:
+        output_name_components.append(pipeline_config.prefix)
+    if pipeline_config.use_mesh_name:
         mesh_name = splitext(basename(mesh_path))[0].replace(" ", "_")
         output_name_components.append(mesh_name)
-
-    if opt.timeformat and opt.timeformat != "":
-        output_name_components.append(datetime.now().strftime(opt.timeformat))
-
+    if pipeline_config.timeformat:
+        output_name_components.append(
+            datetime.now().strftime(pipeline_config.timeformat)
+        )
     output_name = "_".join(output_name_components)
     output_dir = join(output_root, "_exp", output_name)
 
@@ -216,12 +208,12 @@ def load_config(
     else:
         raise ValueError(f"Output directory {output_dir} already exists")
 
-    logging_config: LoggingConfig = LoggingConfig(
-        output_dir=output_dir,
-        log_interval=opt.log_interval,
-        view_fast_preview=opt.view_fast_preview,
-        tex_fast_preview=opt.tex_fast_preview,
-    )
+    logging_config = {
+        "output_dir": output_dir,
+        "log_interval": pipeline_config.log_interval,
+        "view_fast_preview": pipeline_config.view_fast_preview,
+        "tex_fast_preview": pipeline_config.tex_fast_preview,
+    }
 
     return logging_config, mesh_path
 
