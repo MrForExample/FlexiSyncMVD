@@ -61,7 +61,8 @@ The system is optimized for Linux with an Nvidia GPU, though Windows users can u
 2. Create and activate a virtual environment:
 
    ```bash
-   uv venv && source .venv/bin/activate
+   conda create -n flexisyncmvd python=3.11 -y
+   conda activate flexisyncmvd
    ```
 
 3. Install dependencies:
