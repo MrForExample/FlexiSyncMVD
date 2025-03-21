@@ -237,26 +237,26 @@ The pipeline generates high-quality textured 3D models based on text prompts. Be
   <col style="width: 25%;">
   <col style="width: 25%;">
   <tr>
-    <td><img src="FlexiSyncMVD/assets/gif/batman.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/david.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/teapot.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/vangogh.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/flying_car.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/gate.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/lamp.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/marcille.gif" width="170"></td>
   </tr>
   <tr style="vertical-align: text-top;">
-    <td style="font-family:courier">"Photo of Batman, sitting on a rock."</td>
-    <td style="font-family:courier">"Publicity photo of a 60s movie, full color."</td>
-    <td style="font-family:courier">"A photo of a beautiful chintz glided teapot."</td>
-    <td style="font-family:courier">"A beautiful oil paint of a stone building in Van Gogh style."</td>
+    <td style="font-family:courier">"A pink metal flying car with black window on each side of the car door, futuristic cyberpunk style, pure grey background, detailed, 8k"</td>
+    <td style="font-family:courier">"a volcanic gate"</td>
+    <td style="font-family:courier">"a lamp made of gold with a lava bulb"</td>
+    <td style="font-family:courier">"1girl, white elf, light blue cloth, brown pants, brown slippers, smooth hands, blonde braids, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"</td>
   </tr>
   <tr>
-    <td><img src="FlexiSyncMVD/assets/gif/gloves.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/link.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/monster.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/sneaker.gif" width="170"></td>
     <td><img src="FlexiSyncMVD/assets/gif/house.gif" width="170"></td>
     <td><img src="FlexiSyncMVD/assets/gif/luckycat.gif" width="170"></td>
   </tr>
   <tr style="vertical-align: text-top;">
-    <td style="font-family:courier">"A photo of a robot hand with mechanical joints."</td>
-    <td style="font-family:courier">"Photo of Link in the Legend of Zelda, photo-realistic, Unreal 5."</td>
+    <td style="font-family:courier">"A massive lava monster in the shape of Godzilla, its body is formed of molten rock, with glowing cracks of fiery lava running through its skin. The monster's eyes burn bright like molten embers, smoke and steam rise from its jagged, rock-like spines, which glow with intense heat, detailed, 8k"</td>
+    <td style="font-family:courier">"A photo of a camouflage military boot."</td>
     <td style="font-family:courier">"Photo of a lowpoly fantasy house from Warcraft game, lawn."</td>
     <td style="font-family:courier">"Blue and white pottery style lucky cat with intricate patterns."</td>
   </tr>
