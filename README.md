@@ -251,14 +251,14 @@ The pipeline generates high-quality textured 3D models based on text prompts. Be
   <tr>
     <td><img src="FlexiSyncMVD/assets/gif/monster.gif" width="170"></td>
     <td><img src="FlexiSyncMVD/assets/gif/sneaker.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/house.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/luckycat.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/cammy.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/face.gif" width="170"></td>
   </tr>
   <tr style="vertical-align: text-top;">
     <td style="font-family:courier">"A massive lava monster in the shape of Godzilla, its body is formed of molten rock, with glowing cracks of fiery lava running through its skin. The monster's eyes burn bright like molten embers, smoke and steam rise from its jagged, rock-like spines, which glow with intense heat, detailed, 8k"</td>
     <td style="font-family:courier">"A photo of a camouflage military boot."</td>
-    <td style="font-family:courier">"Photo of a lowpoly fantasy house from Warcraft game, lawn."</td>
-    <td style="font-family:courier">"Blue and white pottery style lucky cat with intricate patterns."</td>
+    <td style="font-family:courier">"Cammy from Street Fighter, she wears a tight green V shape bodysuit, bare skin legs from feet to thighs with no pants to cover it. A red beret with a black star tops her head, and she has long blonde braids. Her red combat gauntlets and piercing blue eyes emphasize her readiness for battle, detailed, 8k"</td>
+    <td style="font-family:courier">"Portrait photo of Kratos, god of war."</td>
   </tr>
 </table>
 
