@@ -1,6 +1,6 @@
-# FlexiSyncMVD - Server Texture Pipeline
+# FlexiSyncMVD - Generate 2k texture for a 3D object from a text or image prompt in 2 minutes
 
-This repository combines the power of **FlexiSyncMVD**, a tool for generating and modifying textures for 3D objects from text or image prompts, with a robust **Server Texture Pipeline**. Built on top of FlexiSyncMVD, this pipeline leverages modern technologies like FastAPI, Pydantic, Boto3, Docker, and Trimesh to provide a scalable, modular, and flexible system for texture generation. The system is designed to integrate seamlessly with new models and datasets, making it ideal for both research and production environments.
+A system for generating and modifying textures for 3D objects from text or image prompts, with a robust **Server Texture Pipeline**. This pipeline leverages modern technologies like FastAPI, Pydantic, Boto3, Docker, and Trimesh to provide a scalable, modular, and flexible system for texture generation. The system is designed to integrate seamlessly with new models and datasets, making it ideal for both research and production environments.
 
 ## Showcase of Results
 
@@ -29,8 +29,6 @@ The pipeline generates high-quality textured 3D models based on text prompts. Be
 </table>
 
 ## Description of How the System Works
-
-The **Server Texture Pipeline** extends the capabilities of FlexiSyncMVD by adding a server-side API to process texture generation requests asynchronously. The system operates as follows:
 
 1. **Input Processing**: Users submit requests via a RESTful API (e.g., `POST /texture`) with parameters such as mesh file name, text prompt, model type (SD1.5 or SDXL), and various configuration options (e.g., steps, conditioning type, seed). The input mesh is typically retrieved from an S3 bucket.
 
