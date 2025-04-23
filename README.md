@@ -37,7 +37,7 @@ The system is optimized for Linux with an Nvidia GPU, though Windows users can u
   sudo ubuntu-drivers install
   ```
 
-- **UV Tool**: Install the UV dependency manager.
+- **UV Tool [Optional]**: Install the UV dependency manager.
 
   ```bash
   curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -84,16 +84,17 @@ The system is optimized for Linux with an Nvidia GPU, though Windows users can u
 
 ### Pretrained Models
 
+- Fine-tuned checkpoints must be manually downloaded and placed in `FlexiSyncMVD/_checkpoints`:
+  - [juggernautXL_juggXIByRundiffusion](https://civitai.com/models/133005/juggernaut-xl?modelVersionId=782002)
+  - [leosamsHelloworldXL_helloworldXL70](https://civitai.com/models/43977/leosams-helloworld-xl?modelVersionId=570138)
+  - [AnythingXL_xl](https://civitai.com/models/9409/or-anything-xl?modelVersionId=384264)
 - Models are downloaded automatically on demand:
   - [runwayml/stable-diffusion-v1-5](https://huggingface.co/runwayml/stable-diffusion-v1-5)
   - [lllyasviel/control_v11f1p_sd15_depth](https://huggingface.co/lllyasviel/control_v11f1p_sd15_depth)
   - [lllyasviel/control_v11p_sd15_normalbae](https://huggingface.co/lllyasviel/control_v11p_sd15_normalbae)
   - [stabilityai/stable-diffusion-xl-base-1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0)
   - [diffusers/controlnet-depth-sdxl-1.0](https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0)
-- Fine-tuned checkpoints must be manually downloaded and placed in `FlexiSyncMVD/_checkpoints`:
-  - [juggernautXL_juggXIByRundiffusion](https://civitai.com/models/133005/juggernaut-xl?modelVersionId=782002)
-  - [leosamsHelloworldXL_helloworldXL70](https://civitai.com/models/43977/leosams-helloworld-xl?modelVersionId=570138)
-  - [AnythingXL_xl](https://civitai.com/models/9409/or-anything-xl?modelVersionId=384264)
+
 
 ### Environment Variables
 
@@ -232,37 +233,28 @@ Customize settings via `.yaml` files or command-line arguments (see `configs.py`
 The pipeline generates high-quality textured 3D models based on text prompts. Below are some examples:
 
 <table style="table-layout: fixed; width: 100%;">
-  <col style="width: 25%;">
-  <col style="width: 25%;">
-  <col style="width: 25%;">
-  <col style="width: 25%;">
+  <col style="width: 20%;">
+  <col style="width: 20%;">
+  <col style="width: 20%;">
+  <col style="width: 20%;">
+  <col style="width: 20%;">
   <tr>
-    <td><img src="FlexiSyncMVD/assets/gif/flying_car.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/gate.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/lamp.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/marcille.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/Monster.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/Marcille.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/Cammy.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/Cammy_IP.gif" width="170"></td>
+	<td><img src="FlexiSyncMVD/assets/gif/Lamp_IP.gif" width="170"></td>
   </tr>
-  <tr style="vertical-align: text-top;">
-    <td style="font-family:courier">"A pink metal flying car with black window on each side of the car door, futuristic cyberpunk style, pure grey background, detailed, 8k"</td>
-    <td style="font-family:courier">"a volcanic gate"</td>
-    <td style="font-family:courier">"a lamp made of gold with a lava bulb"</td>
-    <td style="font-family:courier">"1girl, white elf, light blue cloth, brown pants, brown slippers, smooth hands, blonde braids, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"</td>
-  </tr>
-  <tr>
-    <td><img src="FlexiSyncMVD/assets/gif/monster.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/sneaker.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/cammy.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/face.gif" width="170"></td>
-  </tr>
-  <tr style="vertical-align: text-top;">
+  <tr style="vertical-align: top;">
     <td style="font-family:courier">"A massive lava monster in the shape of Godzilla, its body is formed of molten rock, with glowing cracks of fiery lava running through its skin. The monster's eyes burn bright like molten embers, smoke and steam rise from its jagged, rock-like spines, which glow with intense heat, detailed, 8k"</td>
-    <td style="font-family:courier">"A photo of a camouflage military boot."</td>
-    <td style="font-family:courier">"Cammy from Street Fighter, she wears a tight green V shape bodysuit, bare skin legs from feet to thighs with no pants to cover it. A red beret with a black star tops her head, and she has long blonde braids. Her red combat gauntlets and piercing blue eyes emphasize her readiness for battle, detailed, 8k"</td>
-    <td style="font-family:courier">"Portrait photo of Kratos, god of war."</td>
+    <td style="font-family:courier">"1girl, white elf, light blue cloth, brown pants, brown slippers, smooth hands, blonde braids, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"</td>
+    <td style="font-family:courier">"1girl, Cammy white, Street Fighter, smooth legs, smooth thighs, no pants, no socks, short red ankle boots, green V shape upper bodysuit, red beret with a black star, blonde braids, black combat gauntlets, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"</td>
+    <td><img src="FlexiSyncMVD/data/cammy/_sampled/MVD_10Dec2024-215833/front_view_depth_condition_generated_reference_image.png"></td>
+	<td><img src="FlexiSyncMVD/data/lamp/_sampled/MVD_18Dec2024-170835/generated_ip_image_18Dec2024-170851.png"></td>
   </tr>
 </table>
 
-### Training Logs (Example)
+### Inference Logs (Example)
 
 When running inference, logs are generated to track progress. Example log output for the flying car example:
 
@@ -291,8 +283,6 @@ Logs are saved in the `output_dir` specified in the response, with images logged
 
 ## References
 
-- [Pytorch](https://pytorch.org/)
-- [Diffusers](https://github.com/huggingface/diffusers)
 - [Text-Guided Texturing by Synchronized Multi-View Diffusion](https://arxiv.org/pdf/2311.12891)
 - [SyncTweedies: A General Generative Framework Based on Synchronized Diffusions](https://arxiv.org/abs/2403.14370)
 - [FlexiTex: Enhancing SyncTweedies Texture Generation via Visual Guidance](https://arxiv.org/abs/2409.12431)
