@@ -2,6 +2,32 @@
 
 This repository combines the power of **FlexiSyncMVD**, a tool for generating and modifying textures for 3D objects from text or image prompts, with a robust **Server Texture Pipeline**. Built on top of FlexiSyncMVD, this pipeline leverages modern technologies like FastAPI, Pydantic, Boto3, Docker, and Trimesh to provide a scalable, modular, and flexible system for texture generation. The system is designed to integrate seamlessly with new models and datasets, making it ideal for both research and production environments.
 
+## Showcase of Results
+
+The pipeline generates high-quality textured 3D models based on text prompts. Below are some examples:
+
+<table style="table-layout: fixed; width: 100%;">
+  <col style="width: 20%;">
+  <col style="width: 20%;">
+  <col style="width: 20%;">
+  <col style="width: 20%;">
+  <col style="width: 20%;">
+  <tr>
+    <td><img src="FlexiSyncMVD/assets/gif/Monster.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/Marcille.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/Cammy.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/gif/Cammy_IP.gif" width="170"></td>
+	<td><img src="FlexiSyncMVD/assets/gif/Lamp_IP.gif" width="170"></td>
+  </tr>
+  <tr style="vertical-align: top;">
+    <td style="font-family:courier">"A massive lava monster in the shape of Godzilla, its body is formed of molten rock, with glowing cracks of fiery lava running through its skin. The monster's eyes burn bright like molten embers, smoke and steam rise from its jagged, rock-like spines, which glow with intense heat, detailed, 8k"</td>
+    <td style="font-family:courier">"1girl, white elf, light blue cloth, brown pants, brown slippers, smooth hands, blonde braids, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"</td>
+    <td style="font-family:courier">"1girl, Cammy white, Street Fighter, smooth legs, smooth thighs, no pants, no socks, short red ankle boots, green V shape upper bodysuit, red beret with a black star, blonde braids, black combat gauntlets, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"</td>
+    <td><img src="FlexiSyncMVD/data/cammy/_sampled/MVD_10Dec2024-215833/front_view_depth_condition_generated_reference_image.png"></td>
+	<td><img src="FlexiSyncMVD/data/lamp/_sampled/MVD_18Dec2024-170835/generated_ip_image_18Dec2024-170851.png"></td>
+  </tr>
+</table>
+
 ## Description of How the System Works
 
 The **Server Texture Pipeline** extends the capabilities of FlexiSyncMVD by adding a server-side API to process texture generation requests asynchronously. The system operates as follows:
@@ -225,34 +251,6 @@ python FlexiSyncMVD/main.py --config FlexiSyncMVD/data/cammy/config_sdxl_ip.yaml
 ```
 
 Customize settings via `.yaml` files or command-line arguments (see `configs.py`).
-
-## Showcase of Results and Training Logs
-
-### Showcase of Results
-
-The pipeline generates high-quality textured 3D models based on text prompts. Below are some examples:
-
-<table style="table-layout: fixed; width: 100%;">
-  <col style="width: 20%;">
-  <col style="width: 20%;">
-  <col style="width: 20%;">
-  <col style="width: 20%;">
-  <col style="width: 20%;">
-  <tr>
-    <td><img src="FlexiSyncMVD/assets/gif/Monster.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/Marcille.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/Cammy.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/Cammy_IP.gif" width="170"></td>
-	<td><img src="FlexiSyncMVD/assets/gif/Lamp_IP.gif" width="170"></td>
-  </tr>
-  <tr style="vertical-align: top;">
-    <td style="font-family:courier">"A massive lava monster in the shape of Godzilla, its body is formed of molten rock, with glowing cracks of fiery lava running through its skin. The monster's eyes burn bright like molten embers, smoke and steam rise from its jagged, rock-like spines, which glow with intense heat, detailed, 8k"</td>
-    <td style="font-family:courier">"1girl, white elf, light blue cloth, brown pants, brown slippers, smooth hands, blonde braids, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"</td>
-    <td style="font-family:courier">"1girl, Cammy white, Street Fighter, smooth legs, smooth thighs, no pants, no socks, short red ankle boots, green V shape upper bodysuit, red beret with a black star, blonde braids, black combat gauntlets, blue eyes, grey background, masterpiece, best quality, very aesthetic, absurdres"</td>
-    <td><img src="FlexiSyncMVD/data/cammy/_sampled/MVD_10Dec2024-215833/front_view_depth_condition_generated_reference_image.png"></td>
-	<td><img src="FlexiSyncMVD/data/lamp/_sampled/MVD_18Dec2024-170835/generated_ip_image_18Dec2024-170851.png"></td>
-  </tr>
-</table>
 
 ### Inference Logs (Example)
 
