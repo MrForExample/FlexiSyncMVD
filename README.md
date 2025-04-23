@@ -13,11 +13,11 @@ The pipeline generates high-quality textured 3D models based on text prompts. Be
   <col style="width: 20%;">
   <col style="width: 20%;">
   <tr>
-    <td><img src="FlexiSyncMVD/assets/gif/Monster.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/Marcille.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/Cammy.gif" width="170"></td>
-    <td><img src="FlexiSyncMVD/assets/gif/Cammy_IP.gif" width="170"></td>
-	<td><img src="FlexiSyncMVD/assets/gif/Lamp_IP.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/Monster.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/Marcille.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/Cammy.gif" width="170"></td>
+    <td><img src="FlexiSyncMVD/assets/Cammy_IP.gif" width="170"></td>
+	<td><img src="FlexiSyncMVD/assets/Lamp_IP.gif" width="170"></td>
   </tr>
   <tr style="vertical-align: top;">
     <td style="font-family:courier">"A massive lava monster in the shape of Godzilla, its body is formed of molten rock, with glowing cracks of fiery lava running through its skin. The monster's eyes burn bright like molten embers, smoke and steam rise from its jagged, rock-like spines, which glow with intense heat, detailed, 8k"</td>
